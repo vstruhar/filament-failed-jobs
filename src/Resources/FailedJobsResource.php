@@ -56,7 +56,7 @@ class FailedJobsResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options(
-                        fn() => FailedJob::group('queue')
+                        fn () => FailedJob::group('queue')
                             ->get()
                             ->pluck('queue')
                             ->mapWithKeys(fn ($queue) => [$queue => Str::title($queue)])
