@@ -1,13 +1,11 @@
-# The Laravel Filament plugin for managing failed jobs offers a streamlined interface to monitor, retry, and delete failed jobs directly from the admin panel.
+# Filament plugin for managing failed jobs
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/vstruhar/filament-failed-jobs.svg?style=flat-square)](https://packagist.org/packages/vstruhar/filament-failed-jobs)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/vstruhar/filament-failed-jobs/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/vstruhar/filament-failed-jobs/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/vstruhar/filament-failed-jobs/fix-php-code-styling.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/vstruhar/filament-failed-jobs/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/vstruhar/filament-failed-jobs.svg?style=flat-square)](https://packagist.org/packages/vstruhar/filament-failed-jobs)
 
 
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+The Laravel Filament plugin for managing failed jobs offers a streamlined interface to monitor, retry, and delete failed jobs directly from the admin panel.
 
 ## Installation
 
@@ -17,43 +15,49 @@ You can install the package via composer:
 composer require vstruhar/filament-failed-jobs
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="filament-failed-jobs-migrations"
-php artisan migrate
-```
-
 You can publish the config file with:
 
 ```bash
 php artisan vendor:publish --tag="filament-failed-jobs-config"
 ```
 
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="filament-failed-jobs-views"
-```
-
 This is the contents of the published config file:
 
 ```php
 return [
+    'resources' => [
+        'enabled' => true,
+        'label' => 'Failed job',
+        'plural_label' => 'Failed jobs',
+        'navigation_group' => 'Settings',
+        'navigation_icon' => 'heroicon-o-exclamation-triangle',
+        'navigation_sort' => null,
+        'navigation_count_badge' => false,
+    ],
 ];
 ```
 
 ## Usage
 
+Add `FilamentFailedJobsPlugin` to plugins array in `AdminPanelProvider.php`.
+
 ```php
-$filamentFailedJobs = new Vstruhar\FilamentFailedJobs();
-echo $filamentFailedJobs->echoPhrase('Hello, Vstruhar!');
+    // AdminPanelProvider.php
+    ->plugins([
+        // ...
+        FilamentFailedJobsPlugin::make(),
+    ])
 ```
 
-## Testing
+Optionally you can chain `enableNavigation` method and add logic when to enable navigation button in the main sidebar.
 
-```bash
-composer test
+```php
+    // AdminPanelProvider.php
+    ->plugins([
+        // ...
+        FilamentFailedJobsPlugin::make(),
+            ->enableNavigation(fn() => auth()->user()->role === 'admin'),
+    ])
 ```
 
 ## Changelog
@@ -71,7 +75,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 ## Credits
 
 - [Vladimir Struhar](https://github.com/vstruhar)
-- [All Contributors](../../contributors)
+- Inspired by [filament-jobs-monitor](https://github.com/croustibat/filament-jobs-monitor)
 
 ## License
 
