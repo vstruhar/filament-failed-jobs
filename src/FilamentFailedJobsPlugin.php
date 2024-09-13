@@ -15,7 +15,7 @@ class FilamentFailedJobsPlugin implements Plugin
     /**
      * The resource navigation status.
      */
-    protected bool|Closure $navigation = true;
+    protected bool | Closure $navigation = true;
 
     /**
      * Get the plugin identifier.
@@ -70,7 +70,7 @@ class FilamentFailedJobsPlugin implements Plugin
     /**
      * Enable the resource navigation.
      */
-    public function enableNavigation(bool|Closure $callback = true): static
+    public function enableNavigation(bool | Closure $callback = true): static
     {
         $this->navigation = $callback;
 

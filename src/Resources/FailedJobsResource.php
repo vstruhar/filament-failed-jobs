@@ -167,17 +167,17 @@ class FailedJobsResource extends Resource
                         if (filled($data['value'])) {
                             if ($data['value'] === 'today') {
                                 $query->where('failed_at', '>=', now()->startOfDay());
-                            } else if ($data['value'] === 'yesterday') {
+                            } elseif ($data['value'] === 'yesterday') {
                                 $query->where('failed_at', '>=', now()->subDay()->startOfDay())
                                     ->where('failed_at', '<', now()->startOfDay());
-                            } else if ($data['value'] === 'this_week') {
+                            } elseif ($data['value'] === 'this_week') {
                                 $query->where('failed_at', '>=', now()->startOfWeek());
-                            } else if ($data['value'] === 'last_week') {
+                            } elseif ($data['value'] === 'last_week') {
                                 $query->where('failed_at', '>=', now()->subWeek()->startOfWeek())
                                     ->where('failed_at', '<', now()->startOfWeek());
-                            } else if ($data['value'] === 'this_month') {
+                            } elseif ($data['value'] === 'this_month') {
                                 $query->where('failed_at', '>=', now()->startOfMonth());
-                            } else if ($data['value'] === 'last_month') {
+                            } elseif ($data['value'] === 'last_month') {
                                 $query->where('failed_at', '>=', now()->subMonth()->startOfMonth())
                                     ->where('failed_at', '<', now()->startOfMonth());
                             }
