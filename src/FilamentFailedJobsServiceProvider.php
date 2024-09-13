@@ -22,12 +22,13 @@ class FilamentFailedJobsServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package->name(static::$name)
-            ->hasInstallCommand(function (InstallCommand $command) {
-                $command
-                    ->publishConfigFile()
-                    ->publishMigrations()
-                    ->askToRunMigrations();
-            });
+            // ->hasInstallCommand(function (InstallCommand $command) {
+            //     $command
+            //         ->publishConfigFile()
+            //         ->publishMigrations()
+            //         ->askToRunMigrations();
+            // })
+            ->hasConfigFile();
 
         $configFileName = $package->shortName();
 
