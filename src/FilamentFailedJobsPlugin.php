@@ -8,7 +8,7 @@ use Vstruhar\FilamentFailedJobs\Resources\FailedJobsResource;
 
 class FilamentFailedJobsPlugin implements Plugin
 {
-/**
+    /**
      * Get the plugin identifier.
      */
     public function getId(): string
