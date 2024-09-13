@@ -3,21 +3,26 @@
 namespace Vstruhar\FilamentFailedJobs\Resources;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ViewField;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Vstruhar\FilamentFailedJobs\FilamentFailedJobsPlugin;
 use Vstruhar\FilamentFailedJobs\Models\FailedJob;
 use Vstruhar\FilamentFailedJobs\Resources\FailedJobsResource\Pages\ListFailedJobs;
 
@@ -31,12 +36,24 @@ class FailedJobsResource extends Resource
             ->schema([
                 TextInput::make('uuid')
                     ->readOnly(),
+                DateTimePicker::make('failed_at')
+                    ->readOnly(),
                 TextInput::make('connection')
                     ->readOnly(),
                 TextInput::make('queue')
                     ->readOnly(),
-                DateTimePicker::make('failed_at')
-                    ->readOnly(),
+                KeyValue::make('models')
+                    ->addable(false)
+                    ->deletable(false)
+                    ->editableKeys(false)
+                    ->editableValues(false)
+                    ->keyLabel('Variable')
+                    ->valueLabel('Model')
+                    ->formatStateUsing(fn (Model $record) => $record->getModels()->mapWithKeys(fn ($value, $key) => ['$' . $key => $value])->toArray())
+                    ->hidden(fn (Model $record) => $record->getModels()->isEmpty()),
+                ViewField::make('exception')
+                    ->view('filament-failed-jobs::exception-field')
+                    ->columnSpan(2),
             ]);
     }
 
@@ -48,15 +65,17 @@ class FailedJobsResource extends Resource
                     ->label('UUID')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('exception')
-                    ->formatStateUsing(fn (Model $record): string => (string) str($record->exception)->before(': ')->afterLast('\\')),
+                    ->formatStateUsing(fn (Model $record): string => $record->exceptionClass()),
                 TextColumn::make('message')
                     ->wrap()
-                    ->state(fn (Model $record): string => (string) str($record->exception)->between(': ', '. ')),
+                    ->state(fn (Model $record): string => $record->exceptionMessage()),
                 TextColumn::make('models')
-                    ->state(fn (Model $record): string => collect($record->payload['tags'])->map(fn ($tag) => str($tag)->afterLast('\\'))->join('<br>'))
+                    ->default('-')
+                    ->state(fn (Model $record): string => $record->getModels()->implode('<br>'))
                     ->html(),
                 TextColumn::make('connection')
                     ->sortable()
+                    ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('queue')
                     ->sortable()
@@ -80,14 +99,24 @@ class FailedJobsResource extends Resource
                 DeleteBulkAction::make(),
             ])
             ->headerActions([
-                Action::make('retry_all')
-                    ->button()
-                    ->icon('heroicon-m-arrow-path')
-                    ->requiresConfirmation()
-                    ->action(function (Component $livewire) {
-                        Artisan::call('queue:retry', ['id' => 'all']);
-                        $livewire->resetTable();
-                    }),
+                ActionGroup::make([
+                    Action::make('retry_all')
+                        ->icon('heroicon-m-arrow-path')
+                        ->requiresConfirmation()
+                        ->action(function (Component $livewire) {
+                            Artisan::call('queue:retry', ['id' => 'all']);
+                            $livewire->resetTable();
+                        }),
+                    Action::make('delete_all')
+                        ->color('danger')
+                        ->icon('heroicon-m-trash')
+                        ->requiresConfirmation()
+                        ->modalDescription('Are you sure you want to delete all failed jobs?')
+                        ->action(function (Component $livewire) {
+                            Artisan::call('queue:flush');
+                            $livewire->resetTable();
+                        }),
+                ]),
             ])
             ->actions([
                 Action::make('retry')
@@ -97,6 +126,8 @@ class FailedJobsResource extends Resource
                         $record->retry();
                         $livewire->resetTable();
                     }),
+                ViewAction::make()
+                    ->button(),
             ])
             ->filters([
                 SelectFilter::make('queue')
@@ -121,6 +152,35 @@ class FailedJobsResource extends Resource
                     ->query(function (Builder $query, array $data) {
                         if (filled($data['value'])) {
                             return $query->where('connection', $data['value']);
+                        }
+                    }),
+                SelectFilter::make('failed_at')
+                    ->options([
+                        'today' => 'Today',
+                        'yesterday' => 'Yesterday',
+                        'this_week' => 'This week',
+                        'last_week' => 'Last week',
+                        'this_month' => 'This month',
+                        'last_month' => 'Last month',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (filled($data['value'])) {
+                            if ($data['value'] === 'today') {
+                                $query->where('failed_at', '>=', now()->startOfDay());
+                            } else if ($data['value'] === 'yesterday') {
+                                $query->where('failed_at', '>=', now()->subDay()->startOfDay())
+                                    ->where('failed_at', '<', now()->startOfDay());
+                            } else if ($data['value'] === 'this_week') {
+                                $query->where('failed_at', '>=', now()->startOfWeek());
+                            } else if ($data['value'] === 'last_week') {
+                                $query->where('failed_at', '>=', now()->subWeek()->startOfWeek())
+                                    ->where('failed_at', '<', now()->startOfWeek());
+                            } else if ($data['value'] === 'this_month') {
+                                $query->where('failed_at', '>=', now()->startOfMonth());
+                            } else if ($data['value'] === 'last_month') {
+                                $query->where('failed_at', '>=', now()->subMonth()->startOfMonth())
+                                    ->where('failed_at', '<', now()->startOfMonth());
+                            }
                         }
                     }),
             ]);
@@ -160,7 +220,7 @@ class FailedJobsResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return config('filament-failed-jobs.resources.enabled');
+        return FilamentFailedJobsPlugin::get()->shouldRegisterNavigation();
     }
 
     public static function getNavigationIcon(): string
