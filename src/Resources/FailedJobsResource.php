@@ -99,6 +99,14 @@ class FailedJobsResource extends Resource
                 DeleteBulkAction::make(),
             ])
             ->headerActions([
+                Action::make('retry_filtered')
+                    ->icon('heroicon-m-arrow-path')
+                    ->requiresConfirmation()
+                    ->action(function (Component $livewire) {
+                        $livewire->getFilteredTableQuery()->chunkById(50, fn ($records) => $records->each->retry());
+                        $livewire->resetTable();
+                    })
+                    ->visible(fn (Component $livewire) => collect($livewire->tableFilters)->pluck('value')->filter()->isNotEmpty()),
                 ActionGroup::make([
                     Action::make('retry_all')
                         ->icon('heroicon-m-arrow-path')
