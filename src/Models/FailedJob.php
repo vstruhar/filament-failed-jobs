@@ -2,15 +2,12 @@
 
 namespace Vstruhar\FilamentFailedJobs\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 
 class FailedJob extends Model
 {
-    use HasFactory;
-
     protected $table = 'failed_jobs';
 
     protected $guarded = [];
