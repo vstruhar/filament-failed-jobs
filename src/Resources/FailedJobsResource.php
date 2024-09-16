@@ -79,8 +79,7 @@ class FailedJobsResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('queue')
                     ->sortable()
-                    ->badge()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->badge(),
                 TextColumn::make('failed_at')
                     ->label('Failed at')
                     ->dateTime()
