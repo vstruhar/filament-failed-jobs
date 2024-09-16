@@ -7,6 +7,17 @@
 
 The Laravel Filament plugin for managing failed jobs offers a streamlined interface to monitor, retry, and delete failed jobs directly from the admin panel.
 
+<img width="100%" src="https://github.com/user-attachments/assets/8cd045d7-b23a-46e4-977a-47117decdcd0">
+
+<img width="100%" src="https://github.com/user-attachments/assets/ad6c6139-91cd-4b77-9047-2a66878b07f0">
+
+## Features
+- Retry or delete all failed jobs
+- Retry or delete single failed job
+- Retry or delete selected failed jobs
+- Retry or delete filtered failed jobs
+- Can view details of the failed job with exception stack trace and models with ids
+
 ## Installation
 
 You can install the package via composer:
@@ -67,10 +78,6 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 ## Contributing
 
 Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
 
 ## Credits
 
