@@ -139,8 +139,9 @@ class FailedJobsResource extends Resource
             ->filters([
                 SelectFilter::make('queue')
                     ->options(
-                        fn () => FailedJob::groupBy('queue')
-                            ->get()
+                        fn () => \DB::table('failed_jobs')
+                            ->distinct()
+                            ->get('queue')
                             ->pluck('queue')
                             ->mapWithKeys(fn ($value) => [$value => Str::title($value)])
                     )
