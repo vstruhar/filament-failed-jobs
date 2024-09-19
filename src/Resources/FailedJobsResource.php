@@ -139,9 +139,7 @@ class FailedJobsResource extends Resource
             ->filters([
                 SelectFilter::make('queue')
                     ->options(
-                        fn () => \DB::table('failed_jobs')
-                            ->distinct()
-                            ->get('queue')
+                        fn () => FailedJob::distinct()
                             ->pluck('queue')
                             ->mapWithKeys(fn ($value) => [$value => Str::title($value)])
                     )
@@ -152,8 +150,7 @@ class FailedJobsResource extends Resource
                     }),
                 SelectFilter::make('connection')
                     ->options(
-                        fn () => FailedJob::groupBy('connection')
-                            ->get()
+                        fn () => FailedJob::distinct()
                             ->pluck('connection')
                             ->mapWithKeys(fn ($value) => [$value => Str::title($value)])
                     )
