@@ -22,7 +22,7 @@ class FilamentFailedJobsPlugin implements Plugin
      */
     public function getId(): string
     {
-        return 'filament-jobs-monitor';
+        return 'filament-failed-jobs';
     }
 
     /**
