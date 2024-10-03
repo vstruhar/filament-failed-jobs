@@ -2,6 +2,10 @@
 
 All notable changes to `filament-failed-jobs` will be documented in this file.
 
+## Plugin id fix - 2024-10-03
+
+Fixed issue reported in issue #1
+
 ## Made queue column toggleable - 2024-09-20
 
 When queues are processes by the aws sqs, fomr Vapor for example, the queue name is a url which is quite long to be shown in the table. So ability to hide queue column was added.
