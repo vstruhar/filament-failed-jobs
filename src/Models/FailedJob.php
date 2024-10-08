@@ -43,12 +43,16 @@ class FailedJob extends Model
     {
         $command = $this->payload['data']['command'] ?? null;
 
-        return collect($command ? unserialize($command) : [])
-            ->map(
-                fn ($value) => ($value instanceof Model)
-                    ? class_basename(get_class($value)) . ':' . $value->id
-                    : null
-            )
-            ->filter();
+        try {
+            return collect($command ? unserialize($command) : [])
+                ->map(
+                    fn ($value) => ($value instanceof Model)
+                        ? class_basename(get_class($value)) . ':' . $value->id
+                        : null
+                )
+                ->filter();
+        } catch (ModelNotFoundException $e) {
+            return collect(['not found']);
+        }
     }
 }
