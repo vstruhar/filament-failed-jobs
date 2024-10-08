@@ -3,6 +3,7 @@
 namespace Vstruhar\FilamentFailedJobs\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 
