@@ -61,6 +61,9 @@ class FailedJobsResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                    ->label('ID')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('uuid')
                     ->label('UUID')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -69,10 +72,10 @@ class FailedJobsResource extends Resource
                 TextColumn::make('message')
                     ->wrap()
                     ->state(fn (Model $record): string => $record->exceptionMessage()),
-                TextColumn::make('models')
+                /*TextColumn::make('models')
                     ->default('-')
                     ->state(fn (Model $record): string => $record->getModels()->implode('<br>'))
-                    ->html(),
+                    ->html(),*/
                 TextColumn::make('connection')
                     ->sortable()
                     ->badge()
