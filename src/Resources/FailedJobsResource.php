@@ -2,17 +2,17 @@
 
 namespace Vstruhar\FilamentFailedJobs\Resources;
 
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ViewField;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -30,10 +30,10 @@ class FailedJobsResource extends Resource
 {
     protected static ?string $model = FailedJob::class;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('uuid')
                     ->readOnly(),
                 DateTimePicker::make('failed_at')
@@ -90,7 +90,7 @@ class FailedJobsResource extends Resource
                     ->sortable(),
             ])
             ->defaultSort('failed_at', 'desc')
-            ->bulkActions([
+            ->toolbarActions([
                 BulkAction::make('retry')
                     ->label('Retry selected')
                     ->icon('heroicon-m-arrow-path')
@@ -129,7 +129,7 @@ class FailedJobsResource extends Resource
                         }),
                 ]),
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('retry')
                     ->button()
                     ->icon('heroicon-m-arrow-path')
